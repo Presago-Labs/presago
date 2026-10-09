@@ -55,6 +55,7 @@ The deployment output is stored locally in the ignored `deploy-output.json` file
 | Tool | Notes |
 | --- | --- |
 | **Python 3** | to serve the static frontend |
+| **Node.js 22** | for frontend validation scripts (`.nvmrc`) |
 | **Freighter** | browser wallet on Stellar Testnet |
 | **Rust + Stellar CLI** | only for the contracts workspace |
 
