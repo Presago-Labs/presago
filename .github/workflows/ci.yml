@@ -50,6 +50,8 @@ jobs:
         \ is ignored\"\n  exit 1\nfi\nif grep -Eq '^[[:space:]]*(!)?contracts/' .gitignore;\
         \ then\n  echo \"::error::Obsolete contracts ignore rule found\"\n  exit 1\n\
         fi\n"
+    - name: Test frontend validator with offline fixtures
+      run: node --test tests/validate-frontend.ids.test.js tests/validate-frontend.resolve.test.js
   contracts:
     name: Soroban contracts
     if: hashFiles('contracts/**') != ''
