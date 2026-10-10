@@ -1,11 +1,12 @@
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const os = require('node:os');
-const path = require('node:path');
-const { pathToFileURL } = require('node:url');
-const { spawnSync } = require('node:child_process');
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { spawnSync } from 'node:child_process';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const scripts = path.resolve(__dirname, '../scripts');
 const helper = import(pathToFileURL(path.join(scripts, 'frontend-assets.mjs')).href);
 const cases = [
@@ -31,7 +32,9 @@ for (const [reference, expected] of cases) {
     const page = path.join(root, 'frontend/index.html');
     const { resolveLocalAsset } = await helper;
     assert.equal(resolveLocalAsset(page, reference), expected === null ? null : path.join(root, 'frontend', expected));
-    for (const name of ['validate-frontend.mjs', 'frontend-assets.mjs']) fs.copyFileSync(path.join(scripts, name), path.join(root, 'scripts', name));
+    for (const name of fs.readdirSync(scripts)) {
+      if (name.endsWith('.mjs')) fs.copyFileSync(path.join(scripts, name), path.join(root, 'scripts', name));
+    }
     fs.writeFileSync(path.join(root, 'frontend/styles.css'), '/* synthetic */');
     fs.writeFileSync(page, '<html lang="en"><head><meta charset="utf-8"><meta name="viewport"><title>Fixture</title></head><body><a href="' + reference + '">link</a></body></html>');
     const run = spawnSync(process.execPath, [path.join(root, 'scripts/validate-frontend.mjs')], { cwd: root, encoding: 'utf8', timeout: 5000 });
