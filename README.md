@@ -166,7 +166,7 @@ cd contracts
 cargo test --workspace
 ```
 
-The current contract suite contains 89 passing tests.
+The Soroban contracts test suite (89 passing tests) runs within the dedicated contracts repository. In this frontend repository, run `npm test` and `node scripts/validate-frontend.mjs` to execute frontend validator and regression suites.
 
 ## Testnet deployment
 
