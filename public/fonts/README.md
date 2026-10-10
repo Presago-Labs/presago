@@ -1,24 +1,34 @@
 # Fonts Directory
 
-This directory contains custom fonts for the Blockchain Explorer application.
+This directory contains Font Awesome icon font assets.
 
-## Required Font Files
+## Inventory of Font Files
 
-The application expects the following font files:
+The following Font Awesome font files are present in this directory:
 
-1. **BlockchainFont-Regular.woff2** and **BlockchainFont-Regular.woff**
-   - Regular weight font for the main UI
+### Font Awesome Brands (`fa-brands-400`)
+- `fa-brands-400.woff2`
+- `fa-brands-400.woff`
+- `fa-brands-400.ttf`
+- `fa-brands-400.eot`
+- `fa-brands-400.svg`
 
-2. **BlockchainFont-Bold.woff2** and **BlockchainFont-Bold.woff**
-   - Bold weight font for headings
+### Font Awesome Regular (`fa-regular-400`)
+- `fa-regular-400.woff2`
+- `fa-regular-400.woff`
+- `fa-regular-400.ttf`
+- `fa-regular-400.eot`
+- `fa-regular-400.svg`
 
-3. **TechMono-Regular.woff2** and **TechMono-Regular.woff**
-   - Monospace font for code and hash displays
+### Font Awesome Solid (`fa-solid-900` / `fa-solid-500`)
+- `fa-solid-900.woff2`
+- `fa-solid-900.woff`
+- `fa-solid-900.ttf`
+- `fa-solid-900.eot`
+- `fa-solid-900.svg`
+- `fa-solid-500.woff2`
 
-## Note
+## Current Status
 
-If you don't have custom fonts, the application will fall back to system fonts:
-- BlockchainFont → system sans-serif fonts
-- TechMono → system monospace fonts (Courier New, etc.)
-
-The fonts are referenced in `public/index.html` and will be loaded automatically when available.
+- These font files are currently **unreferenced** by the Presago static frontend (`frontend/index.html` and `frontend/styles.css` utilize system fonts and inline SVG icons).
+- This directory is retained as vendored font assets or as a candidate for removal in a future asset cleanup.
