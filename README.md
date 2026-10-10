@@ -13,6 +13,7 @@ The frontend uses plain HTML, CSS, and JavaScript. It does not require Node.js, 
 - [How it uses Stellar](#how-it-uses-stellar)
 - [Current status](#current-status)
 - [Repository layout](#repository-layout)
+- [Scripts](#scripts)
 - [Prerequisites](#prerequisites)
 - [Run the static frontend](#run-the-static-frontend)
 - [Frontend files](#frontend-files)
@@ -49,6 +50,19 @@ The deployment output is stored locally in the ignored `deploy-output.json` file
 - `frontend/` — static HTML, CSS, and JavaScript website.
 - `scripts/` — testnet/mainnet deployment and smoke-test scripts.
 - `docs/` — contract invocation examples and technical documentation.
+
+## Scripts
+
+| Script | Purpose |
+| --- | --- |
+| `scripts/deploy-testnet.sh` | Deploys and configures all contracts on Stellar Testnet. |
+| `scripts/deploy-mainnet.sh` | Deploys the contracts to mainnet. |
+| `scripts/create-mainnet-markets.sh` | Seeds the initial mainnet markets after deployment. |
+| `scripts/smoke-test.sh` | Runs the end-to-end contract workflow on Testnet. |
+| `scripts/upgrade-gas-reduction.sh` | Upgrades contracts in place with the gas-reduction build. |
+| `scripts/validate-frontend.mjs` | Validates the static frontend assets. |
+
+The former `scripts/update-accent-names.ps1` script has been retired and deleted. It recursed over the non-existent `frontend/src` directory and only ever wrote `.bak` files; the frontend theme tokens are `--green`, `--green-dark`, and `--red`, so its `accent-green` → `accent-mint` rename does not apply to this codebase.
 
 ## Prerequisites
 
