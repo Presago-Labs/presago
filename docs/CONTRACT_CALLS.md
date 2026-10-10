@@ -228,8 +228,19 @@ Useful view methods: `get_market(market_id)`, `get_bet(market_id, user)`,
 
 ## Contract error codes
 
-Failed invocations trap with a `MarketError` code. The full mapping from
-`contracts/prediction_market/src/lib.rs`:
+Failed invocations trap with a `MarketError` code. The mapping below
+is attributed to the `MarketError` enum in the dedicated
+[Presago contracts repository](https://github.com/Presago-Labs/presago-contracts),
+at [`prediction_market/src/lib.rs`](https://github.com/Presago-Labs/presago-contracts/blob/7e9e5e7166952d7c1934eb2bf0e4d71c09b3b65d/prediction_market/src/lib.rs),
+revision `7e9e5e7` (2026-10-08).
+
+The client-side consumer is `simulationError()` in
+[`frontend/soroban.js`](../frontend/soroban.js). Keep its error-code
+messages synchronized with the contract definitions.
+
+This table covers codes 1–20 and is not exhaustive; consult the
+pinned contract source for additional codes. `OppositeSideBet` (11)
+is retained for ABI compatibility but is no longer emitted.
 
 | Code | Error | Typical cause |
 |------|-------|---------------|
