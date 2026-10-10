@@ -1,5 +1,4 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { extname, join, relative, resolve } from "node:path";
 
 import { resolveLocalAsset } from "./frontend-assets.mjs";
 import { dirname, extname, join, normalize, relative, resolve } from "node:path";
