@@ -26,6 +26,10 @@ jobs:
       run: npm test
     - name: Validate pages and local assets
       run: node scripts/validate-frontend.mjs
+    - name: Test dynamic import validation
+      run: node --test scripts/check-dynamic-imports.test.mjs
+    - name: Validate dynamic import targets
+      run: node scripts/check-dynamic-imports.mjs
     - name: Check JavaScript syntax
       run: find frontend -type f -name '*.js' -print0 | xargs -0 -n1 node --check
     - name: Reject tracked secrets and deployment outputs
@@ -51,7 +55,7 @@ jobs:
         \ then\n  echo \"::error::Obsolete contracts ignore rule found\"\n  exit 1\n\
         fi\n"
     - name: Test frontend validator with offline fixtures
-      run: node --test tests/validate-frontend.ids.test.js tests/validate-frontend.resolve.test.js
+      run: node --test tests/validate-frontend.ids.test.cjs tests/validate-frontend.resolve.test.cjs
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
