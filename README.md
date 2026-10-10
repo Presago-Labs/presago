@@ -237,11 +237,17 @@ Run the commands below from the repository root. Deployment and upgrade scripts 
 
 ## Environment variables
 
-Copy `.env.example` to `.env` and fill in your values (see the file for inline docs). Key groups:
+The static frontend requires no environment variables or configuration files.
+
+For deployment scripts, copy `.deploy.env.example` to `.deploy.env` and fill in your secrets (never commit this file):
+
+```bash
+cp .deploy.env.example .deploy.env
+```
 
 | Variable group | Key variables |
 | --- | --- |
-| Deployment | `DEPLOYER_SECRET`, `SPONSOR_SECRET`, `RESOLVER_PUBLIC_KEY` (in `.deploy.env`, never committed) |
+| Deployment | `DEPLOYER_SECRET`, `SPONSOR_SECRET`, `RESOLVER_PUBLIC_KEY` (in `.deploy.env`, ignored by git) |
 
 ## License
 
