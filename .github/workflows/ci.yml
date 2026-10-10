@@ -62,6 +62,12 @@ jobs:
         node-version-file: .nvmrc
     - name: Test vendor integrity validation
       run: node --test scripts/verify-vendor-integrity.test.mjs
+    - name: Verify vendored frontend integrity
+      run: python3 scripts/verify-vendor-integrity.py
+    - name: Test vendor integrity verifier
+      run: python3 -m unittest discover -s scripts -p 'test_vendor_integrity.py' -v
+    - name: Test frontend validator with offline fixtures
+      run: node --test tests/validate-frontend.ids.test.js tests/validate-frontend.resolve.test.js
   contracts:
     name: Soroban contracts
     runs-on: ubuntu-latest

