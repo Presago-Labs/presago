@@ -38,6 +38,12 @@ jobs:
       shell: bash
       run: "if [ -n \"$(git ls-files 'tiny/commit-*.txt')\" ]; then\n  echo \"::error::tiny/\
         \ placeholder files are tracked\"\n  exit 1\nfi\n"
+    - name: Check out repository
+      uses: actions/checkout@v4
+    - name: Set up Node.js
+      uses: actions/setup-node@v7
+      with:
+        node-version: 22
   contracts:
     name: Soroban contracts
     if: hashFiles('contracts/**') != ''
