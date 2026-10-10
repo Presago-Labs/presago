@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "test": "node --experimental-strip-types --test src/utils/date.test.ts"
+  },
+  "engines": {
+    "node": ">=22.6.0"
+  },
+  "type": "module"
+}

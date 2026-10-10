@@ -24,3 +24,12 @@ The renderer requires `edge-tts` for neural narration:
 ```powershell
 python -m pip install edge-tts
 ```
+
+## Rendered video distribution
+
+The rendered MP4 is a generated artifact and is not tracked in Git.
+Use the rendering instructions above to reproduce it locally.
+
+A permanent external download or release location has not yet been
+confirmed by the project maintainers. Once published, the verified
+download link should be documented here.

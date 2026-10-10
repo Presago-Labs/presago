@@ -1,5 +1,9 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { extname, join, relative, resolve } from "node:path";
+
+import { resolveLocalAsset } from "./frontend-assets.mjs";
 import { dirname, extname, join, normalize, relative, resolve } from "node:path";
+import { verifyVendorIntegrity } from "./verify-vendor-integrity.mjs";
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const frontendRoot = join(repositoryRoot, "frontend");
@@ -17,7 +21,13 @@ function report(file, message) {
   failures.push(`${relative(repositoryRoot, file)}: ${message}`);
 }
 
-const files = walk(frontendRoot).filter((file) => supportedExtensions.has(extname(file))).filter((file) => !file.includes("/vendor/"));
+try {
+  verifyVendorIntegrity(repositoryRoot);
+} catch (error) {
+  report(join(frontendRoot, "vendor/integrity.json"), error.message);
+}
+
+const files = walk(frontendRoot).filter((file) => supportedExtensions.has(extname(file))).filter((file) => !relative(frontendRoot, file).replaceAll("\\", "/").startsWith("vendor/"));
 const htmlFiles = files.filter((file) => extname(file) === ".html");
 
 for (const file of files) {
@@ -43,8 +53,8 @@ for (const file of htmlFiles) {
 
   const references = [...source.matchAll(/\s(?:src|href)=["']([^"']+)["']/gi)].map((match) => match[1]);
   for (const reference of references) {
-    if (/^(?:https?:|mailto:|tel:|data:|#)/i.test(reference)) continue;
-    const localPath = normalize(join(dirname(file), reference.split(/[?#]/, 1)[0]));
+    const localPath = resolveLocalAsset(file, reference);
+    if (localPath === null) continue;
     if (!existsSync(localPath)) report(file, `references missing local asset '${reference}'`);
   }
 }

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Verify vendored frontend bundles against integrity.json."""
 
 import hashlib
@@ -50,15 +50,17 @@ def verify():
 
             for algorithm in ("sha256", "sha384"):
                 expected = info[algorithm]
-                digest = hashlib.new(algorithm, content).hexdigest()
+                import base64
 
-                if not isinstance(expected, str) or not re.fullmatch(
-                    rf"{algorithm}-[0-9a-f]{{{len(digest)}}}",
-                    expected,
+                digest = hashlib.new(algorithm, content).digest()
+                encoded = base64.b64encode(digest).decode("ascii")
+
+                if not isinstance(expected, str) or not expected.startswith(
+                    f"{algorithm}-"
                 ):
                     raise ValueError(f"Invalid {algorithm} manifest value")
 
-                if expected != f"{algorithm}-{digest}":
+                if expected != f"{algorithm}-{encoded}":
                     raise ValueError(f"{algorithm} mismatch")
 
             print(f"PASS: {package} ({relative})")

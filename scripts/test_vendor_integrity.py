@@ -1,4 +1,5 @@
-﻿"""Regression tests for vendored frontend integrity verification."""
+import base64
+"""Regression tests for vendored frontend integrity verification."""
 
 import importlib.util
 import json
@@ -33,8 +34,8 @@ class VendorIntegrityTests(unittest.TestCase):
         self.package = {
             "vendored_file": "frontend/vendor/test.js",
             "size": len(content),
-            "sha256": "sha256-" + hashlib.sha256(content).hexdigest(),
-            "sha384": "sha384-" + hashlib.sha384(content).hexdigest(),
+            "sha256": "sha256-" + base64.b64encode(hashlib.sha256(content).digest()).decode("ascii"),
+            "sha384": "sha384-" + base64.b64encode(hashlib.sha384(content).digest()).decode("ascii"),
         }
 
         self.manifest = self.vendor / "integrity.json"

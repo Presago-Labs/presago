@@ -1,109 +1,129 @@
 name: CI
-
 on:
   push:
-    branches: [main]
-  pull_request:
-  workflow_dispatch:
-
+    branches:
+    - main
+  pull_request: null
+  workflow_dispatch: null
 permissions:
   contents: read
-
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
   frontend:
     name: Static frontend
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Verify vendored frontend integrity
-        run: python3 scripts/verify-vendor-integrity.py
-
-      - name: Test vendor integrity verifier
-        run: python3 -m unittest discover -s scripts -p 'test_vendor_integrity.py' -v
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Validate pages and local assets
-        run: node scripts/validate-frontend.mjs
-
-      - name: Check JavaScript syntax
-        run: find frontend -type f -name '*.js' -print0 | xargs -0 -n1 node --check
-
-      - name: Reject tracked secrets and deployment outputs
-        shell: bash
-        run: |
-          prohibited=$(git ls-files | grep -E '(^|/)(\.env|\.deploy\.env|deploy-output\.json|deploy-mainnet-output\.json)$' || true)
-          if [ -n "$prohibited" ]; then
-            echo "Sensitive or generated deployment files are tracked:"
-            echo "$prohibited"
-            exit 1
-          fi
-
+    - name: Check out repository
+      uses: actions/checkout@v7
+    - name: Verify vendored frontend integrity
+      run: python3 scripts/verify-vendor-integrity.py
+    - name: Test vendor integrity verifier
+      run: python3 -m unittest discover -s scripts -p 'test_vendor_integrity.py' -v
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - name: Run timestamp regression tests
+      run: npm test
+    - name: Validate pages and local assets
+      run: node scripts/validate-frontend.mjs
+    - name: Check JavaScript syntax
+      run: find frontend -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+    - name: Reject tracked secrets and deployment outputs
+      shell: bash
+      run: "prohibited=$(git ls-files | grep -E '(^|/)(\\.env|\\.deploy\\.env|deploy-output\\\
+        .json|deploy-mainnet-output\\.json)$' || true)\nif [ -n \"$prohibited\" ];\
+        \ then\n  echo \"Sensitive or generated deployment files are tracked:\"\n\
+        \  echo \"$prohibited\"\n  exit 1\nfi\n"
+    - name: Assert no tiny/ placeholder files
+      shell: bash
+      run: "if [ -n \"$(git ls-files 'tiny/commit-*.txt')\" ]; then\n  echo \"::error::tiny/\
+        \ placeholder files are tracked\"\n  exit 1\nfi\n"
+    - name: Check out repository
+      uses: actions/checkout@v4
+    - name: Set up Node.js
+      uses: actions/setup-node@v7
+      with:
+        node-version: 22
+    - name: Verify gitignore rules
+      shell: bash
+      run: "if git check-ignore --no-index -q .gitignore; then\n  echo \"::error::.gitignore\
+        \ is ignored\"\n  exit 1\nfi\nif grep -Eq '^[[:space:]]*(!)?contracts/' .gitignore;\
+        \ then\n  echo \"::error::Obsolete contracts ignore rule found\"\n  exit 1\n\
+        fi\n"
+    - name: Test frontend validator with offline fixtures
+      run: node --test tests/validate-frontend.ids.test.js tests/validate-frontend.resolve.test.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: .nvmrc
+    - name: Test vendor integrity validation
+      run: node --test scripts/verify-vendor-integrity.test.mjs
   contracts:
     name: Soroban contracts
-    if: hashFiles('contracts/**') != ''
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+    - name: Check out repository
+      uses: actions/checkout@v4
+    - name: Check if contracts exist
+      id: check_contracts
+      shell: bash
+      run: "if [ -d \"contracts\" ] && [ -f \"contracts/Cargo.toml\" ]; then\n  echo\
+        \ \"exists=true\" >> $GITHUB_OUTPUT\nelse\n  echo \"Soroban contracts moved\
+        \ to dedicated repo; skipping contracts gate.\"\n  echo \"exists=false\" >>\
+        \ $GITHUB_OUTPUT\nfi\n"
+    - name: Install pinned Rust toolchain
+      if: steps.check_contracts.outputs.exists == 'true'
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: 1.91.0
+        components: rustfmt, clippy
+        targets: wasm32v1-none
+    - name: Cache Cargo dependencies
+      if: steps.check_contracts.outputs.exists == 'true'
+      uses: actions/cache@v6
+      with:
+        path: '~/.cargo/registry
 
-      - name: Check if contracts exist
-        id: check_contracts
-        shell: bash
-        run: |
-          if [ -d "contracts" ] && [ -f "contracts/Cargo.toml" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "Soroban contracts moved to dedicated repo; skipping contracts gate."
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
+          ~/.cargo/git
 
-      - name: Install pinned Rust toolchain
-        if: steps.check_contracts.outputs.exists == 'true'
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: 1.91.0
-          components: rustfmt, clippy
-          targets: wasm32v1-none
+          contracts/target
 
-      - name: Cache Cargo dependencies
-        if: steps.check_contracts.outputs.exists == 'true'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            contracts/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('contracts/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          '
+        key: ${{ runner.os }}-cargo-${{ hashFiles('contracts/Cargo.lock') }}
+        restore-keys: ${{ runner.os }}-cargo-
+    - name: Check formatting
+      if: steps.check_contracts.outputs.exists == 'true'
+      working-directory: contracts
+      run: cargo fmt --all -- --check
+    - name: Run Clippy
+      if: steps.check_contracts.outputs.exists == 'true'
+      working-directory: contracts
+      run: cargo clippy --workspace --all-targets --locked -- -D warnings
+    - name: Run contract tests
+      if: steps.check_contracts.outputs.exists == 'true'
+      working-directory: contracts
+      run: cargo test --workspace --locked
+    - name: Build release WASM
+      if: steps.check_contracts.outputs.exists == 'true'
+      working-directory: contracts
+      run: cargo build --workspace --locked --release --target wasm32v1-none
+    - name: Check out repository
+      uses: actions/checkout@v7
+    - name: Cache Cargo dependencies
+      if: steps.check_contracts.outputs.exists == 'true'
+      uses: actions/cache@v4
+      with:
+        path: '~/.cargo/registry
 
-      - name: Check formatting
-        if: steps.check_contracts.outputs.exists == 'true'
-        working-directory: contracts
-        run: cargo fmt --all -- --check
+          ~/.cargo/git
 
-      - name: Run Clippy
-        if: steps.check_contracts.outputs.exists == 'true'
-        working-directory: contracts
-        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+          contracts/target
 
-      - name: Run contract tests
-        if: steps.check_contracts.outputs.exists == 'true'
-        working-directory: contracts
-        run: cargo test --workspace --locked
-
-      - name: Build release WASM
-        if: steps.check_contracts.outputs.exists == 'true'
-        working-directory: contracts
-        run: cargo build --workspace --locked --release --target wasm32v1-none
+          '
+        key: ${{ runner.os }}-cargo-${{ hashFiles('contracts/Cargo.lock') }}
+        restore-keys: ${{ runner.os }}-cargo-
