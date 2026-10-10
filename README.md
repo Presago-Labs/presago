@@ -25,13 +25,26 @@ The frontend uses plain HTML, CSS, and JavaScript. It does not require Node.js, 
 
 ## How it uses Stellar
 
-Presago runs prediction markets on **Stellar** with **Soroban** smart contracts: pools, positions, referrals, and leaderboard rewards are contract state, and the static frontend connects to Freighter and submits `place_bet` invocations to Stellar Testnet. Live contract addresses are listed above.
+Presago runs prediction markets on **Stellar** with **Soroban** smart contracts: pools, positions, referrals, and leaderboard rewards are contract state, and the static frontend connects to Freighter and submits `place_bet` invocations to Stellar Testnet. See the [Testnet contracts](#testnet-contracts) and [Mainnet contracts](#mainnet-contracts) sections for separate network-specific contract IDs, and the [contract call guide](docs/CONTRACT_CALLS.md#mainnet-deployed-contracts) for mainnet examples.
+
+### Mainnet contracts
+
+These contract IDs are documented for **Stellar Mainnet**. They correspond to the [Mainnet deployed contracts table in the contract call guide](docs/CONTRACT_CALLS.md#mainnet-deployed-contracts); they are **not** Testnet contract IDs.
+
+| Contract | Mainnet contract ID |
+| --- | --- |
+| Prediction Market | `CDGNPRYTFDXJLWZE4YDKZXW4IEN2RLPSE4N7VM5HJ7NLPL2QC45GIXI5` |
+| PULSE Token | `CAYL4TKNRMXAX5ZLQGFEZ6XOC2QHTCTN5QC2SB5BEEHLVO6SDU2UBLRH` |
+| Referral Registry | `CAGJVX6EXMCKKWDJCQFIEJ34CZTHZOGLWJM6KQTGDEXEO723CJZ5773H` |
+| Leaderboard | `CCWWOQSDSO3XXLCMA6A2HYRUFYVNUJZ2HPAMFQSPOB4JWYIBY2HWVTOB` |
 
 ## Current status
 
 The Soroban contracts are deployed and initialized on Stellar Testnet. The static frontend displays live public Stellar network data and XLM pricing, connects to Freighter, and submits positions for verified Testnet market #3 directly to the deployed prediction-market contract. The other market cards remain clearly labeled demonstrations.
 
 ### Testnet contracts
+
+These IDs are for **Stellar Testnet** only. They differ from the [Mainnet contracts](#mainnet-contracts) above; use the network-matched IDs and configuration when following the [contract call guide](docs/CONTRACT_CALLS.md#verification-checklist).
 
 | Contract | Testnet address |
 | --- | --- |
