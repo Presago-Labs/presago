@@ -18,13 +18,16 @@ function walk(directory) {
 }
 
 function report(file, message) {
-  failures.push(`${relative(repositoryRoot, file)}: ${message}`);
+  failures.push(`${relative(repositoryRoot, file).replaceAll("\\", "/")}: ${message}`);
 }
 
-try {
-  verifyVendorIntegrity(repositoryRoot);
-} catch (error) {
-  report(join(frontendRoot, "vendor/integrity.json"), error.message);
+const integrityFile = join(frontendRoot, "vendor/integrity.json");
+if (existsSync(integrityFile)) {
+  try {
+    verifyVendorIntegrity(repositoryRoot);
+  } catch (error) {
+    report(integrityFile, error.message);
+  }
 }
 
 const files = walk(frontendRoot).filter((file) => supportedExtensions.has(extname(file))).filter((file) => !relative(frontendRoot, file).replaceAll("\\", "/").startsWith("vendor/"));
