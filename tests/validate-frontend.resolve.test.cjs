@@ -28,16 +28,20 @@ for (const [reference, expected] of cases) {
     t.after(() => fs.rmSync(root, { recursive: true, force: true }));
     fs.mkdirSync(path.join(root, 'scripts'));
     fs.mkdirSync(path.join(root, 'frontend'));
+    // Reuse the repository's real vendor integrity fixture.
+    const sourceVendor = path.resolve(__dirname, '../frontend/vendor');
+    const targetVendor = path.join(root, 'frontend/vendor');
+    fs.cpSync(sourceVendor, targetVendor, { recursive: true });
     const page = path.join(root, 'frontend/index.html');
     const { resolveLocalAsset } = await helper;
     assert.equal(resolveLocalAsset(page, reference), expected === null ? null : path.join(root, 'frontend', expected));
-    for (const name of ['validate-frontend.mjs', 'frontend-assets.mjs']) fs.copyFileSync(path.join(scripts, name), path.join(root, 'scripts', name));
+    for (const name of ['validate-frontend.mjs', 'frontend-assets.mjs', 'verify-vendor-integrity.mjs']) fs.copyFileSync(path.join(scripts, name), path.join(root, 'scripts', name));
     fs.writeFileSync(path.join(root, 'frontend/styles.css'), '/* synthetic */');
     fs.writeFileSync(page, '<html lang="en"><head><meta charset="utf-8"><meta name="viewport"><title>Fixture</title></head><body><a href="' + reference + '">link</a></body></html>');
     const run = spawnSync(process.execPath, [path.join(root, 'scripts/validate-frontend.mjs')], { cwd: root, encoding: 'utf8', timeout: 5000 });
     assert.ifError(run.error);
     assert.equal(run.status, expected === 'missing.css' ? 1 : 0, run.stderr);
-    assert.deepEqual(run.stderr.split(/\r?\n/).filter((line) => line.startsWith('- ')),
+    assert.deepEqual(run.stderr.split(/\r?\n/).filter((line) => line.startsWith('- ')).map((line) => line.replaceAll('\\', '/')),
       expected === 'missing.css' ? ["- frontend/index.html: references missing local asset 'missing.css'"] : []);
   });
 }

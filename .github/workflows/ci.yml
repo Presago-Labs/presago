@@ -55,7 +55,7 @@ jobs:
         \ then\n  echo \"::error::Obsolete contracts ignore rule found\"\n  exit 1\n\
         fi\n"
     - name: Test frontend validator with offline fixtures
-      run: node --test tests/validate-frontend.ids.test.js tests/validate-frontend.resolve.test.js
+      run: node --test tests/validate-frontend.ids.test.cjs tests/validate-frontend.resolve.test.cjs
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:

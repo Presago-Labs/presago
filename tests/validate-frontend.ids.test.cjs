@@ -23,6 +23,10 @@ for (const [name, body, duplicates] of cases) {
     t.after(() => fs.rmSync(root, { recursive: true, force: true }));
     fs.mkdirSync(path.join(root, 'scripts'));
     fs.mkdirSync(path.join(root, 'frontend'));
+    // Reuse the repository's real vendor integrity fixture.
+    const sourceVendor = path.resolve(__dirname, '../frontend/vendor');
+    const targetVendor = path.join(root, 'frontend/vendor');
+    fs.cpSync(sourceVendor, targetVendor, { recursive: true });
     // Keep sibling helper modules when the validator gains imports.
     for (const name of fs.readdirSync(path.dirname(validator))) {
       if (name.endsWith('.mjs')) fs.copyFileSync(path.join(path.dirname(validator), name), path.join(root, 'scripts', name));
@@ -34,7 +38,7 @@ for (const [name, body, duplicates] of cases) {
     });
     assert.ifError(run.error);
     assert.equal(run.status, duplicates.length ? 1 : 0, run.stderr);
-    const failures = run.stderr.split(/\r?\n/).filter((line) => line.startsWith('- '));
+    const failures = run.stderr.split(/\r?\n/).filter((line) => line.startsWith('- ')).map((line) => line.replaceAll('\\', '/'));
     assert.deepEqual(failures, duplicates.map((id) => `- frontend/index.html: contains duplicate id '${id}'`));
     if (!duplicates.length) assert.match(run.stdout, /Validated 1 HTML pages/);
   });
