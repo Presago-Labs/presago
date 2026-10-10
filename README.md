@@ -47,14 +47,13 @@ The Soroban contracts are deployed and initialized on Stellar Testnet. The stati
 
 These IDs are for **Stellar Testnet** only. They differ from the [Mainnet contracts](#mainnet-contracts) above; use the network-matched IDs and configuration when following the [contract call guide](docs/CONTRACT_CALLS.md#verification-checklist).
 
-| Contract | Testnet address |
-| --- | --- |
-| Prediction Market | `CAPCAPWPGPOCENAJFYYIE22WYNFEDVZ3CT73M5MAKILFMBQ5TN2MIS6T` |
-| PRESAGO Token | `CBYUQUXPGWUQRV7STCV3YPVLWNTFJHKLEAG7LVAOK7H4FIFJGZW5P476` |
-| Referral Registry | `CCKVUVYXR6FBB4VFYGDF3IDDUVBRJGKPDDRABTZYKI2LKAJNVLF3TTQ2` |
-| Leaderboard | `CCMNYMUI4XMDBTTMM7E6KNQFF3OVKS3Q2ERJ4EVQGCLW4VQCGUGG2AQM` |
-
-Testnet deployer: `GC5D4ENQ3U3Q23L5RUG2GGIDFFVKOVJ6GUFJRTNIQ6SRP5J7RMECKSL7`
+| Contract / Account | Testnet address / ID | Description |
+| --- | --- | --- |
+| Prediction Market | `CAPCAPWPGPOCENAJFYYIE22WYNFEDVZ3CT73M5MAKILFMBQ5TN2MIS6T` | Market management and settlement contract |
+| PRESAGO Token | `CBYUQUXPGWUQRV7STCV3YPVLWNTFJHKLEAG7LVAOK7H4FIFJGZW5P476` | Reward and payout token contract |
+| Referral Registry | `CCKVUVYXR6FBB4VFYGDF3IDDUVBRJGKPDDRABTZYKI2LKAJNVLF3TTQ2` | User referral and tier registry contract |
+| Leaderboard | `CCMNYMUI4XMDBTTMM7E6KNQFF3OVKS3Q2ERJ4EVQGCLW4VQCGUGG2AQM` | Player ranking and rewards tracking contract |
+| Testnet Deployer | `GC5D4ENQ3U3Q23L5RUG2GGIDFFVKOVJ6GUFJRTNIQ6SRP5J7RMECKSL7` | Authorized admin and testnet deployer account |
 
 The deployment output is stored locally in the ignored `deploy-output.json` file. Contract activity can be inspected with [Stellar Expert Testnet](https://stellar.expert/explorer/testnet).
 
