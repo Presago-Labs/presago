@@ -82,6 +82,7 @@ The former `scripts/update-accent-names.ps1` script has been retired and deleted
 
 | Tool | Notes |
 | --- | --- |
+| **Node.js 22** | to run the frontend validation scripts (`.nvmrc`) |
 | **Python 3** | to serve the static frontend |
 | **Freighter** | browser wallet on Stellar Testnet |
 | **Rust + Stellar CLI** | only for the contracts workspace |
