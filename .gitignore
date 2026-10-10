@@ -2,7 +2,6 @@
 target/
 **/*.rs.bk
 *.wasm
-!contracts/*.wasm
 
 # ── Cargo ──────────────────────────────────────────────────────────────────────
 # Lock file is checked in for binaries, but not for libraries.
@@ -50,4 +49,3 @@ yarn-error.log*
 branch_structure.json
 temp_auto_push.bat
 temp_interactive_push.bat
-.gitignore

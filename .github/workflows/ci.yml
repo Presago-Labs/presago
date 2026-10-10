@@ -22,6 +22,18 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Verify gitignore rules
+        shell: bash
+        run: |
+          if git check-ignore --no-index -q .gitignore; then
+            echo "::error::.gitignore is ignored"
+            exit 1
+          fi
+          if grep -Eq '^[[:space:]]*(!)?contracts/' .gitignore; then
+            echo "::error::Obsolete contracts ignore rule found"
+            exit 1
+          fi
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
