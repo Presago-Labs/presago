@@ -44,6 +44,12 @@ jobs:
       uses: actions/setup-node@v7
       with:
         node-version: 22
+    - name: Verify gitignore rules
+      shell: bash
+      run: "if git check-ignore --no-index -q .gitignore; then\n  echo \"::error::.gitignore\
+        \ is ignored\"\n  exit 1\nfi\nif grep -Eq '^[[:space:]]*(!)?contracts/' .gitignore;\
+        \ then\n  echo \"::error::Obsolete contracts ignore rule found\"\n  exit 1\n\
+        fi\n"
   contracts:
     name: Soroban contracts
     if: hashFiles('contracts/**') != ''
