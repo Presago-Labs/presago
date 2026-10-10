@@ -1,11 +1,13 @@
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const os = require('node:os');
-const path = require('node:path');
-const { spawnSync } = require('node:child_process');
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 // Exercise the actual validator and its reported failures, not a copied regex.
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const validator = path.resolve(__dirname, '../scripts/validate-frontend.mjs');
 const cases = [
   ['unique IDs', '<div id="one"></div><span id="two"></span>', []],
