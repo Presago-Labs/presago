@@ -1,5 +1,5 @@
 export function formatLeaderboardTimestamp(timestamp: string | number | Date): string {
-  if (!timestamp) return '';
+  if (timestamp == null || timestamp === '') return '';
   try {
     const date = new Date(timestamp);
     if (isNaN(date.getTime())) return '';
