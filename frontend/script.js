@@ -129,7 +129,7 @@ function renderMarkets(filter = "all") {
     const index = baseMarkets.findIndex((item) => item.title === market.title);
     const badge = market.onchainId ? `<span class="market-badge live">Testnet #${market.onchainId}</span>` : '<span class="market-badge">Demonstration</span>';
     const action = market.onchainId ? "Place position" : "Preview market";
-    return `<article class="market-card"><div class="market-card-header"><span class="category">${market.category}</span>${badge}</div><h3>${market.title}</h3><p>${market.detail}</p><div class="probability" aria-label="Yes ${market.yes} percent"><span style="width:${market.yes}%"></span></div><div class="outcomes"><strong class="yes">Yes ${market.yes}%</strong><strong class="no">No ${100 - market.yes}%</strong></div><div class="market-card-action"><div class="market-meta"><span>${market.close}</span></div><button class="trade-link" type="button" data-trade-index="${index}">${action} <svg><use href="#i-arrow" /></svg></button></div></article>`;
+    return `<article class="market-card"><div class="market-card-header"><span class="category">${market.category}</span>${badge}</div><h3>${market.title}</h3><p>${market.detail}</p><div class="probability" role="progressbar" aria-label="Yes outcome probability" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${market.yes}"><span style="width:${market.yes}%"></span></div><div class="outcomes"><strong class="yes">Yes ${market.yes}%</strong><strong class="no">No ${100 - market.yes}%</strong></div><div class="market-card-action"><div class="market-meta"><span>${market.close}</span></div><button class="trade-link" type="button" data-trade-index="${index}">${action} <svg aria-hidden="true"><use href="#i-arrow" /></svg></button></div></article>`;
   }).join("");
 }
 
@@ -162,19 +162,20 @@ function selectMarket(index, scroll = true) {
   $("#trade-close").textContent = market.close;
   $("#trade-probability").textContent = `${market.yes}% Yes`;
   $("#trade-probability-bar").style.width = `${market.yes}%`;
+  $("#trade-probability-bar").parentElement.setAttribute("aria-valuenow", String(market.yes));
   $("#yes-price").textContent = `${market.yes}%`;
   $("#no-price").textContent = `${100 - market.yes}%`;
   const submitLabel = $("#submit-order span");
   const mode = $("#trade-mode");
   if (market.onchainId) {
     submitLabel.textContent = "Place Testnet position";
-    mode.innerHTML = '<svg><use href="#i-zap" /></svg> Live Testnet market';
+    mode.innerHTML = '<svg aria-hidden="true"><use href="#i-zap" /></svg> Live Testnet market';
     mode.classList.add("live");
     $("#trade-status").textContent = "Testnet open";
     $("#order-disclaimer").textContent = "Freighter will show the exact contract transaction before anything is submitted.";
   } else {
     submitLabel.textContent = "Preview position";
-    mode.innerHTML = '<svg><use href="#i-help" /></svg> Simulation mode';
+    mode.innerHTML = '<svg aria-hidden="true"><use href="#i-help" /></svg> Simulation mode';
     mode.classList.remove("live");
     $("#trade-status").textContent = "Preview";
     $("#order-disclaimer").textContent = "No funds will move. This interface demonstrates the intended trading flow.";
@@ -188,11 +189,11 @@ function renderPositions() {
   $("#position-list").innerHTML = state.positions.map((position) => {
     let result;
     if (position.status === "pending") {
-      result = `<a class="position-result pending" href="${position.explorerUrl || '#'}" target="_blank" rel="noreferrer">Pending <svg><use href="#i-external" /></svg></a>`;
+      result = `<a class="position-result pending" href="${position.explorerUrl || '#'}" target="_blank" rel="noreferrer">Pending <svg aria-hidden="true"><use href="#i-external" /></svg></a>`;
     } else if (position.status === "failed") {
       result = '<span class="position-result failed">Failed</span>';
     } else if (position.explorerUrl) {
-      result = `<a class="position-result onchain" href="${position.explorerUrl}" target="_blank" rel="noreferrer">Confirmed <svg><use href="#i-external" /></svg></a>`;
+      result = `<a class="position-result onchain" href="${position.explorerUrl}" target="_blank" rel="noreferrer">Confirmed <svg aria-hidden="true"><use href="#i-external" /></svg></a>`;
     } else {
       result = '<span class="position-result">Simulated</span>';
     }
@@ -249,8 +250,11 @@ function reconcilePendingPosition(position) {
 }
 
 document.querySelectorAll("[data-filter]").forEach((button) => button.addEventListener("click", () => {
-  document.querySelectorAll("[data-filter]").forEach((item) => item.classList.remove("active"));
-  button.classList.add("active"); renderMarkets(button.dataset.filter);
+  document.querySelectorAll("[data-filter]").forEach((item) => {
+    item.classList.toggle("active", item === button);
+    item.setAttribute("aria-pressed", String(item === button));
+  });
+  renderMarkets(button.dataset.filter);
 }));
 
 $("#market-list").addEventListener("click", (event) => {
@@ -260,8 +264,10 @@ $("#market-list").addEventListener("click", (event) => {
 
 document.querySelectorAll("[data-outcome]").forEach((button) => button.addEventListener("click", () => {
   state.outcome = button.dataset.outcome;
-  document.querySelectorAll("[data-outcome]").forEach((item) => item.classList.remove("active"));
-  button.classList.add("active");
+  document.querySelectorAll("[data-outcome]").forEach((item) => {
+    item.classList.toggle("active", item === button);
+    item.setAttribute("aria-pressed", String(item === button));
+  });
   updateOrderPreview();
 }));
 $("#stake-amount").addEventListener("input", updateOrderPreview);
@@ -391,13 +397,32 @@ $("#order-form").addEventListener("submit", async (event) => {
   }
 });
 
-document.querySelectorAll("[data-dashboard]").forEach((button) => button.addEventListener("click", () => {
-  document.querySelectorAll("[data-dashboard]").forEach((item) => item.classList.remove("active"));
-  button.classList.add("active");
+const dashboardTabs = [...document.querySelectorAll("[data-dashboard]")];
+function activateDashboardTab(button, focus = false) {
+  dashboardTabs.forEach((item) => {
+    const selected = item === button;
+    item.classList.toggle("active", selected);
+    item.setAttribute("aria-selected", String(selected));
+    item.tabIndex = selected ? 0 : -1;
+  });
   const showPositions = button.dataset.dashboard === "positions";
   $("#positions-view").hidden = !showPositions;
   $("#feed-view").hidden = showPositions;
-}));
+  if (focus) button.focus();
+}
+dashboardTabs.forEach((button, index) => {
+  button.addEventListener("click", () => activateDashboardTab(button));
+  button.addEventListener("keydown", (event) => {
+    let nextIndex;
+    if (event.key === "ArrowRight") nextIndex = (index + 1) % dashboardTabs.length;
+    else if (event.key === "ArrowLeft") nextIndex = (index - 1 + dashboardTabs.length) % dashboardTabs.length;
+    else if (event.key === "Home") nextIndex = 0;
+    else if (event.key === "End") nextIndex = dashboardTabs.length - 1;
+    else return;
+    event.preventDefault();
+    activateDashboardTab(dashboardTabs[nextIndex], true);
+  });
+});
 
 const menuButton = $(".menu-button");
 const siteNav = $("#main-navigation");
