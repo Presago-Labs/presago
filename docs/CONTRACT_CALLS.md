@@ -16,12 +16,12 @@ listed in the deployed contract table.
 ## Environment
 
 ```bash
-export STELLAR_RPC_URL="https://soroban-rpc.mainnet.stellar.gateway.fm"
+export STELLAR_RPC_URL="https://mainnet.sorobanrpc.com"
 export STELLAR_NETWORK_PASSPHRASE="Public Global Stellar Network ; September 2015"
 export PREDICTION_MARKET_ID="CDGNPRYTFDXJLWZE4YDKZXW4IEN2RLPSE4N7VM5HJ7NLPL2QC45GIXI5"
 ```
 
-For testnet work, replace the RPC URL, network passphrase, and contract IDs with
+For testnet work, use `https://soroban-testnet.stellar.org` as the RPC URL, and replace the network passphrase and contract IDs with
 the deployed testnet values.
 
 ## Prediction Market ABI
