@@ -162,6 +162,21 @@ bash scripts/smoke-test.sh
 
 The smoke test creates temporary Friendbot-funded users and checks registration, betting, cancellation, refunds, resolution, claims, token rewards, fees, and leaderboard data.
 
+## Scripts Reference
+
+The `scripts/` directory contains automated entry points for deploying, provisioning, testing, and maintaining Presago on testnet and mainnet:
+
+| Path | Purpose | Required Env / Credentials | Confirmation Prompt | Prerequisites & Notes |
+| --- | --- | --- | --- | --- |
+| `scripts/deploy-testnet.sh` | Deploys token, market, leaderboard, and referral contracts to Stellar Testnet; initializes bindings and minter permissions. | `.deploy.env` (optional; falls back to temporary Friendbot keys) | None | Outputs public contract IDs to `deploy-output.json`. |
+| `scripts/deploy-mainnet.sh` | Deploys the four Presago contracts to Stellar Mainnet with verification and storage TTL initialization. | `DEPLOYER_SECRET`, `SPONSOR_SECRET`, `RESOLVER_PUBLIC_KEY` in `.deploy.env` (min. balance 50 XLM) | `deploy mainnet` (`Type 'deploy mainnet' to confirm`) | Production mainnet release script. Writes outputs to `deploy-output-mainnet.json`. |
+| `scripts/create-mainnet-markets.sh` | Seeds initial prediction markets on Stellar Mainnet from `mainnet-markets.json`. | Admin keystore or `DEPLOYER_SECRET`, `MARKET_ID` from deployment output | `create` (`Review the questions above. Type 'create' to proceed:`) | Must be run after `deploy-mainnet.sh`. |
+| `scripts/mainnet-markets.json` | JSON configuration seed containing initial questions, resolver accounts, and close dates for mainnet markets. | N/A (Static JSON data) | None | Consumed by `scripts/create-mainnet-markets.sh`. |
+| `scripts/smoke-test.sh` | End-to-end integration smoke test exercising user creation, betting, cancellation, refunds, resolution, claims, and fees. | Friendbot access on Testnet | None | **Prerequisite:** Requires `deploy-output.json` in repository root (run `scripts/deploy-testnet.sh` first). |
+| `scripts/upgrade-gas-reduction.sh` | Upgrades installed contract WASM bytecode with gas-reduction optimizations across testnet or mainnet. | Contract IDs (`MARKET_ID`, `TOKEN_ID`, etc.) and admin secret key | None | Verifies installed WASM hashes before updating. |
+| `scripts/validate-frontend.mjs` | Node.js verification script checking vendor asset SRI hashes and syntax validity for static frontend distribution. | Node.js runtime (`node >= 18`) | None | Runs locally or in static frontend CI workflow. |
+| `scripts/update-accent-names.ps1` | Retired PowerShell script intended to rewrite `accent-green` to `accent-mint` in legacy component layouts. | PowerShell runtime | None | **Retired:** Retained for archival reference; targets obsolete directories and is no longer executed. |
+
 ## Security
 
 - Never commit `.deploy.env`, secret keys, seed phrases, or wallet exports.
