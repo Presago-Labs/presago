@@ -38,7 +38,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
+      - name: Run timestamp regression tests
+        run: npm test
       - name: Validate pages and local assets
         run: node scripts/validate-frontend.mjs
 
@@ -52,6 +53,14 @@ jobs:
           if [ -n "$prohibited" ]; then
             echo "Sensitive or generated deployment files are tracked:"
             echo "$prohibited"
+            exit 1
+          fi
+
+      - name: Assert no tiny/ placeholder files
+        shell: bash
+        run: |
+          if [ -n "$(git ls-files 'tiny/commit-*.txt')" ]; then
+            echo "::error::tiny/ placeholder files are tracked"
             exit 1
           fi
 

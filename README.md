@@ -13,6 +13,7 @@ The frontend uses plain HTML, CSS, and JavaScript. It does not require Node.js, 
 - [How it uses Stellar](#how-it-uses-stellar)
 - [Current status](#current-status)
 - [Repository layout](#repository-layout)
+- [Scripts](#scripts)
 - [Prerequisites](#prerequisites)
 - [Run the static frontend](#run-the-static-frontend)
 - [Frontend files](#frontend-files)
@@ -24,13 +25,26 @@ The frontend uses plain HTML, CSS, and JavaScript. It does not require Node.js, 
 
 ## How it uses Stellar
 
-Presago runs prediction markets on **Stellar** with **Soroban** smart contracts: pools, positions, referrals, and leaderboard rewards are contract state, and the static frontend connects to Freighter and submits `place_bet` invocations to Stellar Testnet. Live contract addresses are listed above.
+Presago runs prediction markets on **Stellar** with **Soroban** smart contracts: pools, positions, referrals, and leaderboard rewards are contract state, and the static frontend connects to Freighter and submits `place_bet` invocations to Stellar Testnet. See the [Testnet contracts](#testnet-contracts) and [Mainnet contracts](#mainnet-contracts) sections for separate network-specific contract IDs, and the [contract call guide](docs/CONTRACT_CALLS.md#mainnet-deployed-contracts) for mainnet examples.
+
+### Mainnet contracts
+
+These contract IDs are documented for **Stellar Mainnet**. They correspond to the [Mainnet deployed contracts table in the contract call guide](docs/CONTRACT_CALLS.md#mainnet-deployed-contracts); they are **not** Testnet contract IDs.
+
+| Contract | Mainnet contract ID |
+| --- | --- |
+| Prediction Market | `CDGNPRYTFDXJLWZE4YDKZXW4IEN2RLPSE4N7VM5HJ7NLPL2QC45GIXI5` |
+| PULSE Token | `CAYL4TKNRMXAX5ZLQGFEZ6XOC2QHTCTN5QC2SB5BEEHLVO6SDU2UBLRH` |
+| Referral Registry | `CAGJVX6EXMCKKWDJCQFIEJ34CZTHZOGLWJM6KQTGDEXEO723CJZ5773H` |
+| Leaderboard | `CCWWOQSDSO3XXLCMA6A2HYRUFYVNUJZ2HPAMFQSPOB4JWYIBY2HWVTOB` |
 
 ## Current status
 
 The Soroban contracts are deployed and initialized on Stellar Testnet. The static frontend displays live public Stellar network data and XLM pricing, connects to Freighter, and submits positions for verified Testnet market #3 directly to the deployed prediction-market contract. The other market cards remain clearly labeled demonstrations.
 
 ### Testnet contracts
+
+These IDs are for **Stellar Testnet** only. They differ from the [Mainnet contracts](#mainnet-contracts) above; use the network-matched IDs and configuration when following the [contract call guide](docs/CONTRACT_CALLS.md#verification-checklist).
 
 | Contract | Testnet address |
 | --- | --- |
@@ -48,7 +62,21 @@ The deployment output is stored locally in the ignored `deploy-output.json` file
 - `contracts/` — Rust/Soroban contracts for markets, rewards, referrals, and leaderboards.
 - `frontend/` — static HTML, CSS, and JavaScript website.
 - `scripts/` — testnet/mainnet deployment and smoke-test scripts.
+- The obsolete `scripts/update-accent-names.ps1` utility was retired because `frontend/src` does not exist.
 - `docs/` — contract invocation examples and technical documentation.
+
+## Scripts
+
+| Script | Purpose |
+| --- | --- |
+| `scripts/deploy-testnet.sh` | Deploys and configures all contracts on Stellar Testnet. |
+| `scripts/deploy-mainnet.sh` | Deploys the contracts to mainnet. |
+| `scripts/create-mainnet-markets.sh` | Seeds the initial mainnet markets after deployment. |
+| `scripts/smoke-test.sh` | Runs the end-to-end contract workflow on Testnet. |
+| `scripts/upgrade-gas-reduction.sh` | Upgrades contracts in place with the gas-reduction build. |
+| `scripts/validate-frontend.mjs` | Validates the static frontend assets. |
+
+The former `scripts/update-accent-names.ps1` script has been retired and deleted. It recursed over the non-existent `frontend/src` directory and only ever wrote `.bak` files; the frontend theme tokens are `--green`, `--green-dark`, and `--red`, so its `accent-green` → `accent-mint` rename does not apply to this codebase.
 
 ## Prerequisites
 
@@ -161,6 +189,21 @@ bash scripts/smoke-test.sh
 ```
 
 The smoke test creates temporary Friendbot-funded users and checks registration, betting, cancellation, refunds, resolution, claims, token rewards, fees, and leaderboard data.
+
+## Scripts Reference
+
+The `scripts/` directory contains automated entry points for deploying, provisioning, testing, and maintaining Presago on testnet and mainnet:
+
+| Path | Purpose | Required Env / Credentials | Confirmation Prompt | Prerequisites & Notes |
+| --- | --- | --- | --- | --- |
+| `scripts/deploy-testnet.sh` | Deploys token, market, leaderboard, and referral contracts to Stellar Testnet; initializes bindings and minter permissions. | `.deploy.env` (optional; falls back to temporary Friendbot keys) | None | Outputs public contract IDs to `deploy-output.json`. |
+| `scripts/deploy-mainnet.sh` | Deploys the four Presago contracts to Stellar Mainnet with verification and storage TTL initialization. | `DEPLOYER_SECRET`, `SPONSOR_SECRET`, `RESOLVER_PUBLIC_KEY` in `.deploy.env` (min. balance 50 XLM) | `deploy mainnet` (`Type 'deploy mainnet' to confirm`) | Production mainnet release script. Writes outputs to `deploy-output-mainnet.json`. |
+| `scripts/create-mainnet-markets.sh` | Seeds initial prediction markets on Stellar Mainnet from `mainnet-markets.json`. | Admin keystore or `DEPLOYER_SECRET`, `MARKET_ID` from deployment output | `create` (`Review the questions above. Type 'create' to proceed:`) | Must be run after `deploy-mainnet.sh`. |
+| `scripts/mainnet-markets.json` | JSON configuration seed containing initial questions, resolver accounts, and close dates for mainnet markets. | N/A (Static JSON data) | None | Consumed by `scripts/create-mainnet-markets.sh`. |
+| `scripts/smoke-test.sh` | End-to-end integration smoke test exercising user creation, betting, cancellation, refunds, resolution, claims, and fees. | Friendbot access on Testnet | None | **Prerequisite:** Requires `deploy-output.json` in repository root (run `scripts/deploy-testnet.sh` first). |
+| `scripts/upgrade-gas-reduction.sh` | Upgrades installed contract WASM bytecode with gas-reduction optimizations across testnet or mainnet. | Contract IDs (`MARKET_ID`, `TOKEN_ID`, etc.) and admin secret key | None | Verifies installed WASM hashes before updating. |
+| `scripts/validate-frontend.mjs` | Node.js verification script checking vendor asset SRI hashes and syntax validity for static frontend distribution. | Node.js runtime (`node >= 18`) | None | Runs locally or in static frontend CI workflow. |
+| `scripts/update-accent-names.ps1` | Retired PowerShell script intended to rewrite `accent-green` to `accent-mint` in legacy component layouts. | PowerShell runtime | None | **Retired:** Retained for archival reference; targets obsolete directories and is no longer executed. |
 
 ## Security
 
