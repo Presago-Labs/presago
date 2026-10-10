@@ -206,7 +206,18 @@ ALICE_GROSS=$(invoke --id "$MARKET_ID" \
 pass "Bet gross tracked: $ALICE_GROSS stroops (= 10 XLM)"
 
 FEES_AFTER_BET=$(invoke --id "$MARKET_ID" -- get_accumulated_fees 2>&1 | tr -d '"' | xargs)
-pass "AccumulatedFees after bet: $FEES_AFTER_BET stroops (= 0.15 XLM platform fee)"
+# Alice bets 100,000,000 stroops; the fee is 2% = 2,000,000 stroops.
+# Compare the increase, not the total, so a reused deployment also works.
+if [[ "$FEES" =~ ^[0-9]+$ && "$FEES_AFTER_BET" =~ ^[0-9]+$ ]]; then
+  FEE_DELTA=$((10#$FEES_AFTER_BET - 10#$FEES))
+  if (( FEE_DELTA == 2000000 )); then
+    pass "Accumulated fees increased by 2000000 stroops (2% of 10 XLM)"
+  else
+    fail "Accumulated fee increase: got $FEE_DELTA stroops, expected 2000000 (before=$FEES, after=$FEES_AFTER_BET)"
+  fi
+else
+  fail "Accumulated fees must be numeric (before='$FEES', after='$FEES_AFTER_BET'); expected increase: 2000000 stroops"
+fi
 
 # ── 6. Place NO bet (Bob, 5 XLM) ──────────────────────────────────────────────
 step "6. Bob places NO bet (5 XLM)"
