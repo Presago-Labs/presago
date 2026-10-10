@@ -56,9 +56,10 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version-file: .nvmrc
+    - name: Test vendor integrity validation
+      run: node --test scripts/verify-vendor-integrity.test.mjs
   contracts:
     name: Soroban contracts
-    if: hashFiles('contracts/**') != ''
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
