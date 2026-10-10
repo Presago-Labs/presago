@@ -59,11 +59,10 @@ The deployment output is stored locally in the ignored `deploy-output.json` file
 
 ## Repository layout
 
-- `contracts/` — Rust/Soroban contracts for markets, rewards, referrals, and leaderboards.
 - `frontend/` — static HTML, CSS, and JavaScript website.
-- `scripts/` — testnet/mainnet deployment and smoke-test scripts.
-- The obsolete `scripts/update-accent-names.ps1` utility was retired because `frontend/src` does not exist.
+- `scripts/` — testnet/mainnet deployment, smoke-test, and validator scripts.
 - `docs/` — contract invocation examples and technical documentation.
+- *Smart Contracts* — The Soroban smart contracts have been moved to a dedicated repository. Contract addresses and invocation details are documented in [docs/CONTRACT_CALLS.md](docs/CONTRACT_CALLS.md).
 
 ## Scripts
 
@@ -149,7 +148,7 @@ If a public API is unavailable, the interface displays an unavailable state inst
 
 ## Smart contracts
 
-The Soroban workspace contains four contracts:
+The Soroban contracts have been moved to a dedicated repository. The system interacts with four deployed contracts:
 
 - `prediction_market` — market creation, YES/NO bets, resolution, claims, cancellations, refunds, and fees.
 - `PRESAGO_token` — reward token and authorized minters.
@@ -166,6 +165,7 @@ cargo test --workspace
 ```
 
 The Soroban contracts test suite (89 passing tests) runs within the dedicated contracts repository. In this frontend repository, run `npm test` and `node scripts/validate-frontend.mjs` to execute frontend validator and regression suites.
+For full contract specifications, ABIs, and invocation workflows, see [docs/CONTRACT_CALLS.md](docs/CONTRACT_CALLS.md).
 
 ## Testnet deployment
 
