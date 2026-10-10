@@ -62,6 +62,7 @@ The deployment output is stored locally in the ignored `deploy-output.json` file
 - `contracts/` — Rust/Soroban contracts for markets, rewards, referrals, and leaderboards.
 - `frontend/` — static HTML, CSS, and JavaScript website.
 - `scripts/` — testnet/mainnet deployment and smoke-test scripts.
+- The obsolete `scripts/update-accent-names.ps1` utility was retired because `frontend/src` does not exist.
 - `docs/` — contract invocation examples and technical documentation.
 
 ## Scripts
