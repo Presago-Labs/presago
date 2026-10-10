@@ -22,6 +22,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Verify vendored frontend integrity
+        run: python3 scripts/verify-vendor-integrity.py
+
+      - name: Test vendor integrity verifier
+        run: python3 -m unittest discover -s scripts -p 'test_vendor_integrity.py' -v
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
