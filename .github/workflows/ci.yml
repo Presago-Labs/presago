@@ -43,6 +43,14 @@ jobs:
             exit 1
           fi
 
+      - name: Assert no tiny/ placeholder files
+        shell: bash
+        run: |
+          if [ -n "$(git ls-files 'tiny/commit-*.txt')" ]; then
+            echo "::error::tiny/ placeholder files are tracked"
+            exit 1
+          fi
+
   contracts:
     name: Soroban contracts
     if: hashFiles('contracts/**') != ''
