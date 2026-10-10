@@ -26,7 +26,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
+      - name: Run timestamp regression tests
+        run: npm test
       - name: Validate pages and local assets
         run: node scripts/validate-frontend.mjs
 
