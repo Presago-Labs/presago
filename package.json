@@ -1,4 +1,5 @@
 {
+  "license": "MIT",
   "private": true,
   "scripts": {
     "test": "node --experimental-strip-types --test src/utils/date.test.ts"
