@@ -10,8 +10,6 @@ target/
 # Cargo.lock
 
 # ── Environment & Secrets ──────────────────────────────────────────────────────
-.env
-.env.local
 .env.*.local
 *.pem
 .deploy.env
@@ -35,7 +33,9 @@ npm-debug.log*
 
 # ── Stellar CLI local identity keystore ────────────────────────────────────────
 .stellar/
+.gitignore
 branch_structure.json
 temp_auto_push.bat
 temp_interactive_push.bat
-.gitignore
+config.bat
+node_modules
