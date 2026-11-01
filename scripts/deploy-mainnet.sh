@@ -132,7 +132,7 @@ deploy_contract() {
 # ── Record balance helper ──────────────────────────────────────────────────────
 get_bal() {
   curl -sf "$HORIZON_URL/accounts/$DEPLOYER" \
-    | python3 -c "import sys,json;d=json.load(sys.stdin);print(next(b['balance'] for b in d['balances'] if b['asset_type']=='native'))"
+    | python3 -c "import sys,json;d=json.load(sys.stdin);print(next((b['balance'] for b in d['balances'] if b['asset_type']=='native'), '0'))"
 }
 
 # ── Deploy ─────────────────────────────────────────────────────────────────────
